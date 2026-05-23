@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expression Tree Calculator</title>
+
+    <!-- Bootstrap & Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #ffffff;
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Particle background container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Floating Glassmorphism Card */
+        .container {
+            background: rgba(20, 20, 20, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.12);
+            max-width: 700px;
+            margin: auto;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            animation: cardFloat 5s ease-in-out infinite;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Logo */
+        .logo {
+            width: 120px;
+            filter: drop-shadow(0 0 15px #00e5ff);
+            animation: float 4s ease-in-out infinite;
+            display: block;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Neon Animated Title */
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 38px;
+            color: #00e5ff;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 5px #00e5ff, 0 0 15px #00ffff, 0 0 30px #00ffff;
+            animation: glowPulse 2.5s infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            0% { text-shadow: 0 0 5px #00e5ff, 0 0 15px #00ffff; }
+            100% { text-shadow: 0 0 10px #00e5ff, 0 0 30px #00ffff; }
+        }
+
+        /* Input Glow Pulse */
+        input.form-control {
+            background-color: rgba(38, 38, 38, 0.85);
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            color: #fff;
+            padding: 15px;
+            font-size: 17px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            animation: pulseBorder 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseBorder {
+            0% { border-color: rgba(0, 229, 255, 0.3); }
+            50% { border-color: rgba(0, 229, 255, 0.8); }
+            100% { border-color: rgba(0, 229, 255, 0.3); }
+        }
+
+        input.form-control:focus {
+            border-color: #00e5ff;
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+            outline: none;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 25px;
+            font-weight: 600;
+            font-size: 16px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success {
+            background-color: #00c853;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 200, 83, 0.5);
+        }
+
+        .btn-success:hover {
+            background-color: #00e676;
+            color: #121212;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.7);
+        }
+
+        .btn-secondary {
+            background-color: #424242;
+            border: none;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-secondary:hover {
+            background-color: #616161;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 15px rgba(200, 200, 200, 0.3);
+        }
+
+        /* Result Area */
+        #resultArea h5 {
+            margin-top: 30px;
+            color: #4dd0e1;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        #resultOutput {
+            background-color: rgba(38, 50, 56, 0.85);
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            border: 1px solid rgba(0, 172, 193, 0.3);
+        }
+
+        /* Tree Image */
+        #treeImage {
+            background-color: rgba(38, 50, 56, 0.85);
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 100%;
+            display: block;
+            border: 1px solid rgba(68, 68, 68, 0.5);
+            margin: 15px auto;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+        }
+
+        /* Error Box */
+        #errorArea {
+            font-size: 16px;
+            background-color: #d32f2f;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 576px) {
+            .btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Particle Background -->
+<div id="particles-js"></div>
+
+<div class="container mt-5">
+    <!-- Glowing Floating Logo -->
+   <h2 class="text-center mb-4" 
+    style="color: #00ffe0; text-shadow: 0 0 10px #00ffe0, 0 0 20px #00ffe0;">
+    🧮 Expression Tree Calculator
+</h2>
+
+<form id="expressionForm" class="text-center" style="max-width: 600px; margin: 0 auto;">
+    <input type="text" id="expressionInput" name="expression" 
+           class="form-control mb-4"
+           placeholder="Enter expression, e.g., (2+3)*(5-1)" 
+           style="
+               background: rgba(255,255,255,0.05);
+               border: 2px solid #00ffe0;
+               color: #00ffe0;
+               border-radius: 30px;
+               padding: 12px 20px;
+               font-size: 16px;
+               text-align: center;
+               box-shadow: 0 0 10px #00ffe0 inset;
+           "
+           required>
+
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+        <button type="submit" 
+                class="btn" 
+                style="
+                    background: transparent;
+                    color: #00ffe0;
+                    border: 2px solid #00ffe0;
+                    border-radius: 30px;
+                    padding: 10px 20px;
+                    font-weight: bold;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 0 10px #00ffe0;
+                "
+                onmouseover="this.style.background='#00ffe0'; this.style.color='#000';"
+                onmouseout="this.style.background='transparent'; this.style.color='#00ffe0';">
+            Evaluate & Visualize
+        </button>
+
+        <a href="/" 
+           class="btn" 
+           style="
+               background: transparent;
+               color: #ff3c3c;
+               border: 2px solid #ff3c3c;
+               border-radius: 30px;
+               padding: 10px 20px;
+               font-weight: bold;
+               transition: all 0.3s ease;
+               box-shadow: 0 0 10px #ff3c3c;
+           "
+           onmouseover="this.style.background='#ff3c3c'; this.style.color='#000';"
+           onmouseout="this.style.background='transparent'; this.style.color='#ff3c3c';">
+            Back to Dashboard
+        </a>
+    </div>
+</form>
+
+
+    <!-- Result Display -->
+    <div id="resultArea" class="mt-4" style="display: none;">
+        <h5>Result:</h5>
+        <div id="resultOutput"></div>
+
+        <h5 class="mt-4">Expression Tree:</h5>
+        <img id="treeImage" src="" alt="Expression Tree">
+    </div>
+
+    <!-- Error Display -->
+    <div id="errorArea" style="display: none;"></div>
+</div>
+
+<!-- JS Logic -->
+<script>
+    $(document).ready(function () {
+        $('#expressionForm').submit(function (e) {
+            e.preventDefault();
+            const expression = $('#expressionInput').val();
+
+            $.ajax({
+                url: '/evaluate',
+                type: 'POST',
+                data: JSON.stringify({ expression }),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#errorArea').hide();
+                    $('#resultArea').fadeIn();
+                    $('#resultOutput').text(response.result);
+                    $('#treeImage').attr('src', response.tree_image_url);
+                },
+                error: function (xhr) {
+                    $('#resultArea').hide();
+                    const errorText = xhr.responseJSON?.error || "An unknown error occurred.";
+                    $('#errorArea').text(errorText).fadeIn();
+                }
+            });
+        });
+    });
+      function drawLine(x1, y1, x2, y2) {
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    line.setAttribute("stroke", "#444");
+    svg.appendChild(line);
+  }
+
+    // Particle Background Config (Multi-color)
+    particlesJS("particles-js", {
+        particles: {
+            number: { value: 100 },
+            size: { value: 3 },
+            move: { speed: 1.5 },
+            line_linked: {
+                enable: true,
+                color: "#00e5ff"
+            },
+            color: { value: ["#00e5ff", "#ff00e5", "#00ff9f"] }
+        }
+    });
+</script>
+</body>
+
+</html>
